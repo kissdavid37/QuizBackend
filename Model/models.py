@@ -37,8 +37,7 @@ class Groups(Base):
     id = Column(Integer,primary_key=True,nullable=False,unique=True)
     name = Column(String(100),nullable=False,unique=True)
 
-    def __init__(self,id,name):
-        self.id = id
+    def __init__(self,name):
         self.name = name
 
 class Questions(Base):

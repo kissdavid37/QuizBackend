@@ -21,4 +21,8 @@ if __name__ == '__main__':
     #imported here becouse the circular error
     from Routes.questions import questions_bp
     app.register_blueprint(questions_bp)
+
+    from Routes.Group import group_bp
+    app.register_blueprint(group_bp)
+
     app.run(debug=True)
