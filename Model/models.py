@@ -22,7 +22,7 @@ class Game(Base):
     id = Column(Integer,primary_key=True,nullable=False,unique=True)
     group_id = Column(Integer,ForeignKey('groups.id'))
     question_id = Column(Integer,ForeignKey('questions.id'),nullable=False)
-    user_id = Column(String(250),ForeignKey('users.id'),nullable=False)
+    user_id = Column(Integer,ForeignKey('users.id'),nullable=False)
     user_answer = Column(Integer,ForeignKey('answers.id'))
 
     def __init__(self,id,groupId,questionId,userId,userAnswer):
@@ -34,16 +34,15 @@ class Game(Base):
 
 class Groups(Base):
     __tablename__ = 'groups'
-    id = Column(Integer,nullable=False,unique=True)
-    name = Column (String(100),nullable=False,unique=True)
+    id = Column(Integer,primary_key=True,nullable=False,unique=True)
+    name = Column(String(100),nullable=False,unique=True)
 
-    def __init__(self,id,name):
-        self.id = id
+    def __init__(self,name):
         self.name = name
 
 class Questions(Base):
     __tablename__ = 'questions'
-    id = Column(Integer, nullable=False, unique=True)
+    id = Column(Integer, primary_key=True, nullable=False, unique=True)
     text = Column (String(250), unique=True,nullable=False)
 
     def __init__(self, id, text):
@@ -52,7 +51,7 @@ class Questions(Base):
 
 class Answers(Base):
     __tablename__ = 'answers'
-    id = Column(Integer, nullable=False, unique=True)
+    id = Column(Integer,primary_key=True, nullable=False, unique=True)
     question_id = Column(Integer,ForeignKey('questions.id'), nullable=False)
     text = Column(String(250),nullable=False,unique=True)
     is_correct = Column(Integer, nullable=False)
@@ -65,6 +64,6 @@ class Answers(Base):
 
 class Points(Base):
     __tablename__ = 'points'
-    id = Column(Integer, nullable=False, unique=True)
+    id = Column(Integer,primary_key=True, nullable=False, unique=True)
     user_id = Column(String(250),ForeignKey('users.public_id'),unique=True,nullable=False)
     total_points = Column(Integer)
