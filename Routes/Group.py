@@ -45,3 +45,16 @@ def get_all_groups():
         groups_data = {'id': group.id, 'name': group.name}
         output.append(groups_data)
     return output
+@group_bp.route('/group/<group_name>', methods=['DELETE'])
+def delete_group_by_name(group_name):
+    s = Session()
+    group = s.query(Groups.name).where(Groups.name == group_name).first()
+
+    if group is None:
+        s.close()
+        return make_response('No group with this name!')
+    s.delete(s.query(Groups).where(Groups.name == group_name).first())
+    s.commit()
+    s.close()
+    return jsonify(message = 'The group is deleted')
+
