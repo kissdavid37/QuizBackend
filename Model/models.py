@@ -42,25 +42,23 @@ class Groups(Base):
 
 class Questions(Base):
     __tablename__ = 'questions'
-    id = Column(Integer, primary_key=True, nullable=False, unique=True)
+    id = Column(Integer, primary_key=True,autoincrement=True, nullable=False, unique=True)
     text = Column (String(250), unique=True,nullable=False)
 
-    def __init__(self, id, text):
-        self.id = id
+    def __init__(self, text):
         self.text = text
 
 class Answers(Base):
     __tablename__ = 'answers'
     id = Column(Integer,primary_key=True, nullable=False, unique=True)
     question_id = Column(Integer,ForeignKey('questions.id'), nullable=False)
-    text = Column(String(250),nullable=False,unique=True)
+    text = Column(String(250),nullable=False)
     is_correct = Column(Integer, nullable=False)
 
-    def __init__(self,id,questionId,text,isCorrect):
-        self.id = id
-        self.question_id = questionId
+    def __init__(self,question_id,text,is_correct):
+        self.question_id = question_id
         self.text = text
-        self.is_correct = isCorrect
+        self.is_correct = is_correct
 
 class Points(Base):
     __tablename__ = 'points'

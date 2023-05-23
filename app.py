@@ -25,4 +25,7 @@ if __name__ == '__main__':
     from Routes.Group import group_bp
     app.register_blueprint(group_bp)
 
+    from Routes.Answers import answer_bp
+    app.register_blueprint(answer_bp)
+
     app.run(debug=True)
