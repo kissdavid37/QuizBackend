@@ -21,16 +21,15 @@ class Game(Base):
     __tablename__ = 'game'
     id = Column(Integer,primary_key=True,nullable=False,unique=True)
     group_id = Column(Integer,ForeignKey('groups.id'))
-    question_id = Column(Integer,ForeignKey('questions.id'),nullable=False)
+    question_id = Column(Integer,ForeignKey('questions.id'))
     user_id = Column(Integer,ForeignKey('users.id'),nullable=False)
     user_answer = Column(Integer,ForeignKey('answers.id'))
 
-    def __init__(self,id,groupId,questionId,userId,userAnswer):
-        self.id = id
-        self.group_id = groupId
-        self.question_id = questionId
-        self.user_id = userId
-        self.user_answer = userAnswer
+    def __init__(self,group_id,question_id,user_id,user_answer):
+        self.group_id = group_id
+        self.question_id = question_id
+        self.user_id = user_id
+        self.user_answer = user_answer
 
 class Groups(Base):
     __tablename__ = 'groups'
@@ -65,3 +64,13 @@ class Points(Base):
     id = Column(Integer,primary_key=True, nullable=False, unique=True)
     user_id = Column(String(250),ForeignKey('users.public_id'),unique=True,nullable=False)
     total_points = Column(Integer)
+
+class GroupQuestions(Base):
+    __tablename__ = 'group_questions'
+    id = Column(Integer, primary_key=True,autoincrement=True, nullable=False, unique=True)
+    group_id = Column (Integer,ForeignKey('groups.id'))
+    question_id = Column (Integer,ForeignKey('questions.id'))
+
+    def __init__(self, group_id,question_id):
+        self.group_id = group_id
+        self.question_id=question_id

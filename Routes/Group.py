@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, make_response, request
-from Model.models import Groups
+from sqlalchemy.sql.expression import func
+from Model.models import GroupQuestions, Groups, Questions
 from app import Session
 
 
@@ -21,7 +22,10 @@ def create_group():
     else:
         s.add(new_group)
         s.commit()
+        group_id = s.query(Groups.id).where(Groups.name == data['name']).first()[0]
+        print(group_id)
         s.close()
+        generate_group_questions(group_id)
 
         return data
 
@@ -63,6 +67,18 @@ def delete_group_by_name(group_name):
     s.delete(s.query(Groups).where(Groups.name == group_name).first())
     s.commit()
     s.close()
-    
+
     return jsonify(message = 'The group is deleted')
 
+
+def generate_group_questions(group_id):
+    s = Session()
+    questions=s.query(Questions).order_by(func.newid()).limit(10)
+    group_questions=[]
+    for question in questions:
+        new_group_questions = GroupQuestions(group_id = group_id, question_id=question.id)
+        group_questions.append(new_group_questions)
+    s.bulk_save_objects(group_questions)
+    s.commit()
+
+    s.close()

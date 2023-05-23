@@ -1,5 +1,5 @@
 from flask import Blueprint ,request, make_response,jsonify
-from Model.models import Questions
+from Model.models import GroupQuestions, Groups, Questions
 from app import Session
 questions_bp=Blueprint('questions', __name__)
 
@@ -50,5 +50,20 @@ def delete_question_by_id(question_id):
         s.delete(s.query(Questions).where(Questions.id == question_id).first())
         s.commit()
         s.close()
-        
+
         return jsonify(message = 'Successfully deleted!' )
+    
+@questions_bp.route('/questions/<group_id>')
+def get_questions_by_group(group_id):
+    s = Session()
+    questions=s.query(GroupQuestions).where(GroupQuestions.group_id == group_id)
+    output = []
+
+    for question in questions:
+        question_data={}
+        question_data['group_id']=question.group_id
+        question_data['question_id']=question.question_id
+        output.append(question_data)
+    s.close()
+
+    return output
