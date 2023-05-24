@@ -1,5 +1,5 @@
 from flask import Blueprint ,request, make_response,jsonify
-from Model.models import GroupQuestions, Groups, Questions
+from Model.models import GroupQuestions, Questions
 from app import Session
 questions_bp=Blueprint('questions', __name__)
 
