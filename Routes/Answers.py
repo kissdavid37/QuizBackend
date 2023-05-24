@@ -50,7 +50,6 @@ def create_answer_for_question(question_id):
     else:
         output = []
         for answer in answers:
-            answer_no = answer['no']
             answer_text = answer['text']
             answer_is_correct = answer['is_correct']
             new_answer = Answers(question_id = question_id, text = answer_text, is_correct = answer_is_correct)

@@ -28,4 +28,7 @@ if __name__ == '__main__':
     from Routes.Answers import answer_bp
     app.register_blueprint(answer_bp)
 
-    app.run(debug=True)
+    from Routes.Game import game_bp
+    app.register_blueprint(game_bp)
+
+    app.run(debug=True, host='127.0.0.1', threaded=True)
