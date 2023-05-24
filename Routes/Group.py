@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, make_response, request
+from sqlalchemy import and_
 from sqlalchemy.sql.expression import func
-from Model.models import GroupQuestions, Groups, Questions
+from Model.models import Game, GroupMember, GroupQuestions, Groups, Questions
 from app import Session
 
 
@@ -75,10 +76,36 @@ def generate_group_questions(group_id):
     s = Session()
     questions=s.query(Questions).order_by(func.newid()).limit(10)
     group_questions=[]
+
     for question in questions:
         new_group_questions = GroupQuestions(group_id = group_id, question_id=question.id)
         group_questions.append(new_group_questions)
+
     s.bulk_save_objects(group_questions)
     s.commit()
 
     s.close()
+
+@group_bp.route('/group/<group_id>', methods=['POST'])
+def join_group(group_id):
+    s = Session()
+    data = request.get_json()
+    user_id = data['user_id']
+    
+
+    group_user = s.query(GroupMember).where(and_(GroupMember.group_id == group_id, GroupMember.user_id == user_id)).first()
+
+    if group_user is not None:
+        s.close()
+        return make_response('This user is already in this group!')
+    
+    else:
+        new_member=GroupMember(group_id= group_id, user_id= user_id)
+        s.add(new_member)
+        s.commit()
+        s.close()
+
+        return data
+
+
+    

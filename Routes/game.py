@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, make_response, request
-from Model.models import Game, Groups
+from sqlalchemy import and_
+from Model.models import Game, GroupMember, Groups
 from app import Session
 
 game_bp = Blueprint('game', __name__)
@@ -20,3 +21,30 @@ def create_game():
     s.close
 
     return data
+
+@game_bp.route('/game/<group_name>', methods=['POST'])
+def answer_question(group_name):
+    s = Session()
+    data = request.get_json()
+    user_id = data['user_id']
+    question_id = data['question_id']
+    user_answer = data['user_answer']
+
+    group = s.query(Groups).where(Groups.name == group_name).first()
+    id = s.query(Groups.id).where(Groups.name == group_name).first()[0]
+    member = s.query(GroupMember).where(and_(GroupMember.group_id ==id,GroupMember.user_id ==user_id)).first()
+    if member is None:
+        s.close()
+        return make_response('You are not in this group!')
+    
+    elif group is None:
+        s.close()
+        return make_response('There is no group with this name')
+    
+    else:
+        new_game = Game(group_id = id, question_id= question_id, user_id= user_id, user_answer = user_answer)
+        s.add(new_game)
+        s.commit()
+        s.close
+
+        return jsonify(message= 'question answered successfully!')
