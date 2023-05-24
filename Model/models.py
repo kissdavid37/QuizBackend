@@ -74,3 +74,13 @@ class GroupQuestions(Base):
     def __init__(self, group_id,question_id):
         self.group_id = group_id
         self.question_id=question_id
+
+class GroupMember(Base):
+    __tablename__ = 'group_member'
+    id = Column(Integer, primary_key=True,autoincrement=True, nullable=False, unique=True)
+    group_id = Column (Integer,ForeignKey('groups.id'))
+    user_id = Column (Integer,ForeignKey('users.id'))
+
+    def __init__(self, group_id,user_id):
+        self.group_id = group_id
+        self.user_id=user_id
