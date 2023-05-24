@@ -18,24 +18,30 @@ def get_all_questions():
 
     return output
 
+    
 @questions_bp.route('/questions',methods=['POST'])
 def create_question():
-    data = request.get_json()
-    new_question = Questions(text=data['text'])
+    questions = request.get_json()
     s = Session()
-    question=s.query(Questions).where(Questions.text == data['text']).first()
+    output =[]
+    messages= []
 
-    if question is not None:
-        s.close()
+    for question in questions:
+        question_text = question['text']
+        exist = s.query(Questions).filter(Questions.text == question_text).first()
 
-        return make_response('This question is already in database!',409)
-    
-    else:
-        s.add(new_question)
-        s.commit()
-        s.close()
+        if exist is not None:
+            messages.append(f'Qustion "{question_text}" is already in the database!')
+        else:
+            new_question = Questions(text= question_text)
+            output.append(new_question)
+            messages.append(f'Question {question_text} added to the database!')
+    s.bulk_save_objects(output)
+    s.commit()
+    s.close()
 
-        return jsonify(message='Question added to database!')
+    return jsonify(message= messages)
+
 
 @questions_bp.route('/questions/<question_id>',methods=['DELETE'])
 def delete_question_by_id(question_id):
