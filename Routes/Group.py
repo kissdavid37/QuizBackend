@@ -86,21 +86,25 @@ def generate_group_questions(group_id):
 
     s.close()
 
-@group_bp.route('/group/<group_id>', methods=['POST'])
-def join_group(group_id):
+@group_bp.route('/group/<group_name>', methods=['POST'])
+def join_group(group_name):
     s = Session()
     data = request.get_json()
     user_id = data['user_id']
     
+    group=s.query(Groups.id).where(Groups.name == group_name).first()
+    if group is None:
+        s.close()
+        return make_response('This group does not exists',404)
 
-    group_user = s.query(GroupMember).where(and_(GroupMember.group_id == group_id, GroupMember.user_id == user_id)).first()
+    group_user = s.query(GroupMember).where(and_(GroupMember.group_id == group[0], GroupMember.user_id == user_id)).first()
 
     if group_user is not None:
         s.close()
-        return make_response('This user is already in this group!')
+        return make_response('This user is already in this group!',409)
     
     else:
-        new_member=GroupMember(group_id= group_id, user_id= user_id)
+        new_member=GroupMember(group_id= group[0], user_id= user_id)
         s.add(new_member)
         s.commit()
         s.close()
