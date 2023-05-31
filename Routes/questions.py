@@ -1,5 +1,5 @@
 from flask import Blueprint ,request, make_response,jsonify
-from Model.models import GroupQuestions, Questions
+from Model.models import GroupQuestions, Questions, Groups
 from app import Session
 questions_bp=Blueprint('questions', __name__)
 
@@ -59,17 +59,24 @@ def delete_question_by_id(question_id):
 
         return jsonify(message = 'Successfully deleted!' )
     
-@questions_bp.route('/questions/<group_id>')
-def get_questions_by_group(group_id):
+@questions_bp.route('/questions/<group_name>')
+def get_questions_by_group(group_name):
     s = Session()
-    questions=s.query(GroupQuestions).where(GroupQuestions.group_id == group_id)
-    output = []
+    group_id = s.query(Groups.id).where(Groups.name == group_name).first()
+    if group_id is None:
+        s.close()
+        return make_response('The Group does not exists',404)
+    else:
 
-    for question in questions:
-        question_data={}
-        question_data['group_id']=question.group_id
-        question_data['question_id']=question.question_id
-        output.append(question_data)
-    s.close()
+        questions=s.query(Questions.text,GroupQuestions.question_id,GroupQuestions.group_id).join(GroupQuestions, Questions.id == GroupQuestions.question_id).where(GroupQuestions.group_id == group_id[0])
+        s.close()
+        output = []
 
-    return output
+        for question in questions:
+            question_data={}
+            question_data['group_id']=question.group_id
+            question_data['text']=question.text
+            question_data['question_id']=question.question_id
+            output.append(question_data)
+
+        return output
