@@ -27,7 +27,7 @@ def get_questions_answer(question_id):
     output = []
 
     if not answers:
-        return make_response('No answers for this question!')
+        return make_response('No answers for this question!',404)
     else:
         for answer in answers:
             answers_data = {'id': answer.id, 'question_id': answer.question_id, 'text': answer.text, 'is_correct': answer.is_correct}
