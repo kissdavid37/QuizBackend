@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, make_response, request
 from sqlalchemy import and_
 from sqlalchemy.sql.expression import func
-from Model.models import Game, GroupMember, GroupQuestions, Groups, Questions
+from Model.models import Game, GroupMember, GroupQuestions, Groups, Questions, Users
 from app import Session
+from Routes.Authentication.Authentication import token_required
 
 
 group_bp = Blueprint('group', __name__)
@@ -10,7 +11,8 @@ group_bp = Blueprint('group', __name__)
 
 # random string from frontend
 @group_bp.route('/group', methods=['POST'])
-def create_group():
+@token_required
+def create_group(current_user):
     data = request.get_json()
     s = Session()
     group_name = data['name']
@@ -31,7 +33,8 @@ def create_group():
         return data
 
 @group_bp.route('/group/<group_name>', methods=['GET'])
-def get_group_by_name(group_name):
+@token_required
+def get_group_by_name(current_user,group_name):
     s = Session()
     group = s.query(Groups).where(Groups.name == group_name).first()
     s.close()
@@ -42,7 +45,8 @@ def get_group_by_name(group_name):
         return jsonify(name=group.name)
 
 @group_bp.route('/group',methods=['GET'])
-def get_all_groups():
+@token_required
+def get_all_groups(current_user):
     s = Session()
     output = []
     groups = s.query(Groups).order_by(Groups.id).all()
@@ -58,7 +62,8 @@ def get_all_groups():
     return output
 
 @group_bp.route('/group/<group_name>', methods=['DELETE'])
-def delete_group_by_name(group_name):
+@token_required
+def delete_group_by_name(current_user,group_name):
     s = Session()
     group = s.query(Groups.name).where(Groups.name == group_name).first()
 
@@ -87,16 +92,17 @@ def generate_group_questions(group_id):
     s.close()
 
 @group_bp.route('/group/<group_name>', methods=['POST'])
-def join_group(group_name):
+@token_required
+def join_group(current_user,group_name):
     s = Session()
     data = request.get_json()
-    user_id = data['user_id']
-    
+    public_id = data['public_id']
+    print(public_id)
     group=s.query(Groups.id).where(Groups.name == group_name).first()
     if group is None:
         s.close()
         return make_response('This group does not exists',404)
-
+    user_id = s.query(Users.id).where(Users.public_id ==public_id).first()[0]
     group_user = s.query(GroupMember).where(and_(GroupMember.group_id == group[0], GroupMember.user_id == user_id)).first()
 
     if group_user is not None:

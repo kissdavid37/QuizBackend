@@ -1,10 +1,12 @@
 from flask import Blueprint ,request, make_response,jsonify
 from Model.models import GroupQuestions, Questions, Groups
 from app import Session
+from Routes.Authentication.Authentication import token_required
 questions_bp=Blueprint('questions', __name__)
 
 @questions_bp.route('/questions')
-def get_all_questions():
+@token_required
+def get_all_questions(current_user):
     s = Session()
     questions=s.query(Questions).order_by(Questions.id).all()
     output = []
@@ -20,7 +22,8 @@ def get_all_questions():
 
     
 @questions_bp.route('/questions',methods=['POST'])
-def create_question():
+@token_required
+def create_question(current_user):
     questions = request.get_json()
     s = Session()
     output =[]
@@ -44,7 +47,8 @@ def create_question():
 
 
 @questions_bp.route('/questions/<question_id>',methods=['DELETE'])
-def delete_question_by_id(question_id):
+@token_required
+def delete_question_by_id(current_user,question_id):
     s=Session()
     question=s.query(Questions).where(Questions.id == question_id).first()
 
@@ -60,7 +64,8 @@ def delete_question_by_id(question_id):
         return jsonify(message = 'Successfully deleted!' )
     
 @questions_bp.route('/questions/<group_name>')
-def get_questions_by_group(group_name):
+@token_required
+def get_questions_by_group(current_user,group_name):
     s = Session()
     group_id = s.query(Groups.id).where(Groups.name == group_name).first()
     if group_id is None:

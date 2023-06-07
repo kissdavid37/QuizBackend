@@ -2,11 +2,13 @@ from flask import Blueprint, jsonify, make_response, request
 from sqlalchemy import and_
 from Model.models import Game, GroupMember, Groups, Users, Answers
 from app import Session
+from Routes.Authentication.Authentication import token_required
 
 game_bp = Blueprint('game', __name__)
 
 @game_bp.route('/game', methods = ['POST'])
-def create_game():
+@token_required
+def create_game(current_user):
     s = Session()
     data = request.get_json()
     group_id = data['group_id']
@@ -23,11 +25,12 @@ def create_game():
     return data
 
 @game_bp.route('/game/<group_name>', methods=['POST'])
-def answer_question(group_name):
+@token_required
+def answer_question(current_user,group_name):
     s = Session()
     s2=Session()
     data = request.get_json()
-    user_id = data['user_id']
+    public_id = data['public_id']
     question_id = data['question_id']
     user_answer = data['user_answer']
 
@@ -35,6 +38,7 @@ def answer_question(group_name):
     s2.close()
     group = s.query(Groups).where(Groups.name == group_name).first()
     id = s.query(Groups.id).where(Groups.name == group_name).first()[0]
+    user_id =s.query(Users.id).where(Users.public_id == public_id)
     member = s.query(GroupMember).where(and_(GroupMember.group_id ==id,GroupMember.user_id ==user_id)).first()
     if member is None:
         s.close()

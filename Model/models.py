@@ -7,11 +7,10 @@ class Users(Base):
     id = Column(Integer,primary_key=True,nullable=False,unique=True)
     public_id = Column(String(250),unique=True)
     username = Column(String(50),unique=True,nullable=False)
-    password = Column(String(100),nullable=False)
+    password = Column(String(250),nullable=False)
     admin = Column(Integer,nullable=False)
 
-    def __init__(self,id,publicId,username,password,admin):
-        self.id = id
+    def __init__(self,publicId,username,password,admin):
         self.public_id = publicId
         self.username = username
         self.password = password
@@ -24,12 +23,14 @@ class Game(Base):
     question_id = Column(Integer,ForeignKey('questions.id'))
     user_id = Column(Integer,ForeignKey('users.id'),nullable=False)
     user_answer = Column(Integer,ForeignKey('answers.id'))
+    answer_points=Column(Integer)
 
-    def __init__(self,group_id,question_id,user_id,user_answer):
+    def __init__(self,group_id,question_id,user_id,user_answer,answer_points):
         self.group_id = group_id
         self.question_id = question_id
         self.user_id = user_id
         self.user_answer = user_answer
+        self.answer_points=answer_points
 
 class Groups(Base):
     __tablename__ = 'groups'

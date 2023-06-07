@@ -31,4 +31,7 @@ if __name__ == '__main__':
     from Routes.Game import game_bp
     app.register_blueprint(game_bp)
 
+    from Routes.Authentication.Authentication import auth_bp
+    app.register_blueprint(auth_bp)
+
     app.run(debug=True, host='127.0.0.1', threaded=True)

@@ -1,11 +1,13 @@
 from flask import Blueprint, jsonify, make_response, request
 from Model.models import Answers, Questions
 from app import Session
+from Routes.Authentication.Authentication import token_required
 
 answer_bp= Blueprint('answer', __name__)
 
 @answer_bp.route('/answer', methods=['GET'])
-def get_all_answer():
+@token_required
+def get_all_answer(current_user):
     s = Session()
     output = []
     answers = s.query(Answers).order_by(Answers.question_id).all()
@@ -20,7 +22,8 @@ def get_all_answer():
         return output
 
 @answer_bp.route('/answer/<question_id>', methods=['GET'])
-def get_questions_answer(question_id):
+@token_required
+def get_questions_answer(current_user,question_id):
     s = Session()
     answers = s.query(Answers).where(Answers.question_id == question_id).all()
     s.close()
@@ -35,7 +38,8 @@ def get_questions_answer(question_id):
         return output
 
 @answer_bp.route('/answer/<question_id>', methods=['POST'])
-def create_answer_for_question(question_id):
+@token_required
+def create_answer_for_question(current_user,question_id):
     s = Session()
     answers=request.get_json()
     question = s.query(Questions).where(Questions.id == question_id).first()
